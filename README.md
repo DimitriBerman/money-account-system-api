@@ -32,3 +32,20 @@ npm start
 will run `build` (via the `prestart` hook) and start the compiled application from the `/dist` folder.
 
 The last command is generally what most hosting providers use to start your application when deployed, so it should take care of everything.
+
+#endpoints
+
+
+* GET /
+
+* GET /transactions
+
+* GET /transactions/{id}
+
+* POST /transactions
+  ```json
+  {
+    "type": string,  // "credit" | "debit"
+    "amount": float  // positive value
+  }
+  ```

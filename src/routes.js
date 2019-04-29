@@ -1,8 +1,10 @@
 import { Router } from 'express';
+import { findNodeModule } from 'jest-resolve';
 
 const routes = Router();
 
 const TRANSACTION_URI = '/transactions';
+const TRANSACTION_URI_ID = TRANSACTION_URI + "/:id";
 
 routes.get('/', (req, res) => {
   let balanceResponse = {
@@ -10,7 +12,6 @@ routes.get('/', (req, res) => {
   };
   res.json(balanceResponse);
 });
-
 
 routes.get(TRANSACTION_URI, (req,res) => {
   res.json(transactionHistory_State);
@@ -51,6 +52,23 @@ routes.post(TRANSACTION_URI, (req,res) => {
   res.json(newTransaction);
 });
 
+routes.get(TRANSACTION_URI_ID, (req, res) => {
+  console.info("req.params", req.params);
+
+  let id = req.params.id;
+
+  var result = find([...transactionHistory_State], id);
+
+  console.info("result", result);
+
+  if(!result){
+    res.status(400).send('ERROR: Not Found.');
+    return;
+  }
+
+  res.json(result);
+});
+
 const operations = {
   CREDIT: 'credit',
   DEBIT: 'debit'
@@ -70,7 +88,7 @@ class Transaction {
   }
 }
 
-let getNewId = () => Math.random().toString(32).slice(2);
+let getNewId = () => Math.floor(Math.random() * (100000));
 
 let getCurrentDate = () => new Date().toISOString();
 
@@ -96,7 +114,6 @@ let insert = (t) => {
 
 let validateState = (transactionHistoryToValidate) => {
   console.log("validateState");
-
   console.info("transactionHistoryToValidate", transactionHistoryToValidate);
 
   let balance = getBalance(transactionHistoryToValidate);
@@ -124,5 +141,10 @@ let getBalance = (transactions) => {
 
   return balance;
 };
+
+let find = (state, id) =>
+  state.find((x) =>
+    x.id == id
+  );
 
 export default routes;
