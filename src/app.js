@@ -3,6 +3,7 @@ import path from 'path';
 import logger from 'morgan';
 import bodyParser from 'body-parser';
 import routes from './routes';
+import cors from 'cors';
 
 const app = express();
 app.disable('x-powered-by');
@@ -18,8 +19,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, '../public')));
 
+app.use(cors())
+
 // Routes
 app.use('/', routes);
+
 
 // Catch 404 and forward to error handler
 app.use((req, res, next) => {

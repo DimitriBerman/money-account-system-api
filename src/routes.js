@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { findNodeModule } from 'jest-resolve';
 
 const routes = Router();
 
@@ -98,6 +97,8 @@ let transactionHistory_State = [
   new Transaction(getNewId(), operations.CREDIT, 100, getCurrentDate())
 ];
 
+//TODO: Implement async/await
+//TODO: Microlock --> https://github.com/thebigredgeek/microlock
 let insert = (t) => {
   console.log("insert");
 
@@ -142,6 +143,8 @@ let getBalance = (transactions) => {
   return balance;
 };
 
+//TODO: Implement async/await
+//TODO: Microlock --> https://github.com/thebigredgeek/microlock
 let find = (state, id) =>
   state.find((x) =>
     x.id == id
