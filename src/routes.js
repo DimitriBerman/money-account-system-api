@@ -5,18 +5,20 @@ const routes = Router();
 const TRANSACTION_URI = '/transactions';
 const TRANSACTION_URI_ID = TRANSACTION_URI + "/:id";
 
-routes.get('/', (req, res) => {
+routes.get('/', async (req, res) => {
+  let balance = await Promise.resolve(getBalance(transactionHistory_State));
   let balanceResponse = {
-    balance: getBalance(transactionHistory_State)
+    balance: balance
   };
   res.json(balanceResponse);
 });
 
-routes.get(TRANSACTION_URI, (req,res) => {
-  res.json(transactionHistory_State);
+routes.get(TRANSACTION_URI, async (req,res) => {
+  let response = await Promise.resolve(transactionHistory_State);
+  res.json(response);
 });
 
-routes.post(TRANSACTION_URI, (req,res) => {
+routes.post(TRANSACTION_URI, async (req,res) => {
   console.info("req.body", req.body);
 
   let parsedAmount = parseFloat(req.body.amount);
@@ -27,7 +29,7 @@ routes.post(TRANSACTION_URI, (req,res) => {
   if(!req.body ||
     parsedAmount < 0 ||
     !isTypeValid(type)){
-    res.status(400).send('ERROR: Invalid Transaction.');
+    res.status(400).send(await Promise.resolve('ERROR: Invalid Transaction.'));
   }
 
   let newTransaction = new Transaction(
@@ -37,10 +39,10 @@ routes.post(TRANSACTION_URI, (req,res) => {
     getCurrentDate()
   );
 
-  var newState = insert(newTransaction);
+  var newState = await insert(newTransaction);
 
   if(!newState) {
-    res.status(400).send('ERROR: Invalid Transaction.');
+    res.status(400).send(await Promise.resolve('ERROR: Invalid Transaction.'));
     return;
   }
 
@@ -48,10 +50,10 @@ routes.post(TRANSACTION_URI, (req,res) => {
 
   transactionHistory_State = newState;
 
-  res.json(newTransaction);
+  res.json(await Promise.resolve(newTransaction));
 });
 
-routes.get(TRANSACTION_URI_ID, (req, res) => {
+routes.get(TRANSACTION_URI_ID, async (req, res) => {
   console.info("req.params", req.params);
 
   let id = req.params.id;
@@ -65,7 +67,7 @@ routes.get(TRANSACTION_URI_ID, (req, res) => {
     return;
   }
 
-  res.json(result);
+  res.json(await Promise.resolve(result));
 });
 
 const operations = {
@@ -99,7 +101,7 @@ let transactionHistory_State = [
 
 //TODO: Implement async/await
 //TODO: Microlock --> https://github.com/thebigredgeek/microlock
-let insert = (t) => {
+let insert = async (t) => {
   console.log("insert");
 
   let newTransactionHistoryState = [...transactionHistory_State, t];
@@ -110,7 +112,7 @@ let insert = (t) => {
     return false;
   }
 
-  return newTransactionHistoryState;
+  return await Promise.resolve(newTransactionHistoryState);
 };
 
 let validateState = (transactionHistoryToValidate) => {
